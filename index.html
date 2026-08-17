@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QEVARI — Quality. Excellence. Value.</title>
+<meta name="description" content="QEVARI — Quality, Excellence, Value, Authenticity, Reliability, Innovation.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="announcement">LIVRAISON PARTOUT AU MAROC • PAIEMENT À LA LIVRAISON</div>
+<header><a class="logo" href="#">QEVARI</a><nav><a href="#new" onclick="filterProducts('')">NEW IN</a><a href="#new" onclick="filterProducts('Homme')">HOMME</a><a href="#new" onclick="filterProducts('Femme')">FEMME</a><a href="#new" onclick="filterProducts('Occasion')">OCCASION</a><a href="#new" onclick="filterProducts('Électronique')">ÉLECTRONIQUE</a><a href="#new" onclick="filterProducts('Accessoires')">ACCESSOIRES</a></nav><button class="bag" onclick="openBag()">PANIER <span id="count">0</span></button></header>
+
+<section class="hero"><div class="hero-copy"><p class="eyebrow">QEVARI / 2026</p><h1>DEFINE<br><i>YOUR</i><br>STANDARD.</h1><p>Des essentiels modernes, pensés pour durer.</p><a class="cta" href="#new">SHOP NOW <span>→</span></a></div><div class="hero-visual"><div class="monogram">Q</div><div class="visual-label">QEVARI<br><small>EST. 2026</small></div></div></section>
+
+<div class="ticker"><span>QUALITY — EXCELLENCE — VALUE — AUTHENTICITY — RELIABILITY — INNOVATION — </span></div>
+
+<section class="values" id="values"><div class="section-head"><p class="eyebrow">THE QEVARI CODE</p><h2>6 VALUES.<br><i>ONE IDENTITY.</i></h2></div><div id="valueGrid" class="value-grid"></div></section>
+
+<section class="collection" id="new"><div class="section-head row"><div><p class="eyebrow">CURATED FOR YOU</p><h2 id="collectionTitle">NEW IN</h2></div><a href="#new" onclick="filterProducts('')">VIEW ALL →</a></div><div class="category-filters" aria-label="Catégories de produits"><button class="category-filter active" onclick="filterProducts('')">Tout</button><button class="category-filter" onclick="filterProducts('Homme')">Homme</button><button class="category-filter" onclick="filterProducts('Femme')">Femme</button><button class="category-filter" onclick="filterProducts('Occasion')">Occasion</button><button class="category-filter" onclick="filterProducts('Électronique')">Électronique</button><button class="category-filter" onclick="filterProducts('Accessoires')">Accessoires</button></div><div class="products" id="products"></div></section>
+
+<section class="split"><div class="split-card dark" id="men"><p>01 / HOMME</p><h2>MODERN<br>ESSENTIALS.</h2><a href="#new">SHOP MEN →</a></div><div class="split-card beige" id="women"><p>02 / FEMME</p><h2>EFFORTLESS<br>STYLE.</h2><a href="#new">SHOP WOMEN →</a></div></section>
+
+<section class="statement"><p class="eyebrow">QEVARI WORLDWIDE</p><h2>BEYOND<br><i>ORDINARY.</i></h2><a class="cta dark" href="#new">DISCOVER QEVARI →</a></section>
+
+<section class="newsletter" id="sale"><p class="eyebrow">QEVARI CLUB</p><h2>GET 10% OFF</h2><p>Reçois nos nouveautés et offres exclusives.</p><form onsubmit="join(event)"><input id="email" type="email" placeholder="Votre adresse e-mail" required><button>→</button></form><small id="msg"></small></section>
+
+<footer><div><div class="logo white">QEVARI</div><p>DEFINE YOUR STANDARD.</p></div><div><b>SHOP</b><a>New In</a><a>Homme</a><a>Femme</a><a>Promotions</a></div><div><b>QEVARI</b><a>Our Values</a><a>À propos</a><a>Livraison</a><a>Contact</a></div><div><b>SOCIAL</b><a>Instagram</a><a>TikTok</a><a>Facebook</a></div></footer>
+
+<aside id="bag"><button class="close" onclick="closeBag()">×</button><p class="eyebrow">YOUR BAG</p><h2>TON PANIER</h2><div id="items"></div><div class="total"><span>TOTAL</span><b id="total">0 DH</b></div><button class="checkout" onclick="checkout()">COMMANDER — PAIEMENT À LA LIVRAISON</button></aside><div id="veil" onclick="closeBag()"></div>
+
+<div id="orderModal" class="modal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeOrder()">×</button>
+    <p class="eyebrow">QEVARI CHECKOUT</p>
+    <h2>CONFIRMER<br><i>TA COMMANDE.</i></h2>
+    <form onsubmit="submitOrder(event)" class="order-form">
+      <input name="name" placeholder="Nom complet" required>
+      <input name="phone" type="tel" placeholder="Téléphone" required>
+      <input name="city" placeholder="Ville" required>
+      <textarea name="address" placeholder="Adresse complète" required></textarea>
+      <button type="submit">CONFIRMER — PAIEMENT À LA LIVRAISON</button>
+    </form>
+    <small>Livraison partout au Maroc • Paiement à la livraison</small>
+  </div>
+</div>
+<div id="productDetailModal" class="modal">
+  <div class="modal-card product-detail-card">
+    <button class="modal-close" onclick="closeProductDetails()">×</button>
+    <div class="product-detail-grid">
+      <div>
+        <div id="productDetailMainImage" class="product-detail-main"></div>
+        <div id="productDetailThumbnails" class="product-thumbnails"></div>
+      </div>
+      <div class="product-detail-info">
+        <p class="eyebrow">QEVARI PRODUCT</p>
+        <h2 id="productDetailName"></h2>
+        <p id="productDetailPrice" class="product-detail-price"></p>
+        <p id="productDetailDescription" class="product-detail-description"></p>
+        <button id="productDetailAdd" class="add">AJOUTER AU PANIER</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="successModal" class="modal">
+  <div class="modal-card success-card">
+    <p class="eyebrow">QEVARI</p>
+    <h2>COMMANDE<br><i>ENREGISTRÉE.</i></h2>
+    <p>Merci. Nous allons confirmer votre commande.</p>
+    <a id="whatsappOrder" class="cta dark" target="_blank" rel="noopener">ENVOYER LA COMMANDE SUR WHATSAPP →</a>
+    <button class="text-button" onclick="closeSuccess()">Fermer</button>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="script.js?v=20260817-product-gallery"></script>
+</body></html>

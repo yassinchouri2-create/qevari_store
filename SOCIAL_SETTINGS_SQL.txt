@@ -1,0 +1,20 @@
+-- Run this once in Supabase > SQL Editor to enable social links in Admin.
+create table if not exists public.site_settings (
+  id integer primary key check (id = 1),
+  instagram_url text,
+  tiktok_url text,
+  facebook_url text,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.site_settings enable row level security;
+drop policy if exists "public_read_site_settings" on public.site_settings;
+drop policy if exists "authenticated_manage_site_settings" on public.site_settings;
+create policy "public_read_site_settings"
+on public.site_settings for select
+to anon, authenticated
+using (true);
+create policy "authenticated_manage_site_settings"
+on public.site_settings for all
+to authenticated
+using (true) with check (true);

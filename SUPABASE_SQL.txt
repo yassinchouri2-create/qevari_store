@@ -1,0 +1,65 @@
+-- Run this entire file once in Supabase: SQL Editor.
+-- The storefront can create orders; only logged-in users can manage them.
+create table if not exists public.orders (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  customer_name text not null,
+  customer_phone text not null,
+  customer_city text not null,
+  customer_address text not null,
+  items jsonb not null default '[]'::jsonb,
+  total numeric not null check (total >= 0),
+  status text not null default 'Nouveau'
+);
+
+alter table public.orders enable row level security;
+drop policy if exists "public_insert_orders" on public.orders;
+drop policy if exists "authenticated_read_orders" on public.orders;
+drop policy if exists "authenticated_update_orders" on public.orders;
+drop policy if exists "authenticated_delete_orders" on public.orders;
+create policy "public_insert_orders" on public.orders for insert to anon, authenticated with check (true);
+create policy "authenticated_read_orders" on public.orders for select to authenticated using (true);
+create policy "authenticated_update_orders" on public.orders for update to authenticated using (true) with check (true);
+create policy "authenticated_delete_orders" on public.orders for delete to authenticated using (true);
+
+-- Social network links managed from /admin.html.
+create table if not exists public.site_settings (
+  id integer primary key check (id = 1),
+  instagram_url text,
+  tiktok_url text,
+  facebook_url text,
+  updated_at timestamptz not null default now()
+);
+alter table public.site_settings enable row level security;
+drop policy if exists "public_read_site_settings" on public.site_settings;
+drop policy if exists "authenticated_manage_site_settings" on public.site_settings;
+create policy "public_read_site_settings" on public.site_settings for select to anon, authenticated using (true);
+create policy "authenticated_manage_site_settings" on public.site_settings for all to authenticated using (true) with check (true);
+
+
+-- QEVARI PRODUCTS: public storefront can read active products.
+alter table public.products enable row level security;
+drop policy if exists "public_read_products" on public.products;
+drop policy if exists "authenticated_insert_products" on public.products;
+drop policy if exists "authenticated_update_products" on public.products;
+drop policy if exists "authenticated_delete_products" on public.products;
+
+create policy "public_read_products"
+on public.products for select
+to anon, authenticated
+using (active = true);
+
+create policy "authenticated_insert_products"
+on public.products for insert
+to authenticated
+with check (true);
+
+create policy "authenticated_update_products"
+on public.products for update
+to authenticated
+using (true) with check (true);
+
+create policy "authenticated_delete_products"
+on public.products for delete
+to authenticated
+using (true);
