@@ -42,7 +42,8 @@ function render(){
       <div class="name">${escapeHtml(p.name)}</div>
       <div class="price">${Number(p.price||0).toFixed(2)} DH</div>
       <button class="view-details" onclick="openProductDetails('${escapeHtml(p.id)}')">VOIR LE PRODUIT</button>
-      <button class="add" onclick="addById('${escapeHtml(p.id)}')">AJOUTER AU PANIER</button>
+      <button class="buy-now" onclick="buyNow('${escapeHtml(p.id)}')">COMMANDER DIRECTEMENT</button>
+      <button class="add" onclick="addById('${escapeHtml(p.id)}',event)">AJOUTER AU PANIER</button>
     </div>
   </article>`}).join("");
   renderBag();
@@ -132,15 +133,47 @@ async function loadSocialLinks(){
 function add(i){
   cart.push(products[i]);
   renderBag();
-  openBag();
+  animateToCart(products[i]);
 }
 
-function addById(id){
+function addById(id,event){
   const product=products.find(p=>String(p.id)===String(id));
   if(!product)return;
   cart.push(product);
   renderBag();
-  openBag();
+  animateToCart(product,event?.currentTarget);
+}
+
+function animateToCart(product,source){
+  const target=document.querySelector(".bag");
+  const image=source?.closest(".product")?.querySelector(".photo img")||document.querySelector("#productDetailMainImage img");
+  if(!target || !image){showCartNotice(product);return;}
+  const from=image.getBoundingClientRect();
+  const to=target.getBoundingClientRect();
+  const flying=image.cloneNode(true);
+  flying.className="cart-fly";
+  flying.style.left=from.left+"px";
+  flying.style.top=from.top+"px";
+  flying.style.width=from.width+"px";
+  flying.style.height=from.height+"px";
+  document.body.appendChild(flying);
+  requestAnimationFrame(()=>{
+    flying.style.transform=`translate(${to.left-from.left}px,${to.top-from.top}px) scale(.18)`;
+    flying.style.opacity=".55";
+  });
+  setTimeout(()=>{flying.remove();showCartNotice(product);},650);
+}
+
+function showCartNotice(product){
+  const previous=document.getElementById("cartNotice");
+  if(previous)previous.remove();
+  const imageUrl=getImageUrls(product.image_url)[0];
+  const notice=document.createElement("div");
+  notice.id="cartNotice";
+  notice.className="cart-notice";
+  notice.innerHTML=`${imageUrl?`<img src="${escapeHtml(imageUrl)}" alt="">`:"<span>Q</span>"}<div><b>AJOUTÉ AU PANIER</b><small>${escapeHtml(product.name||"Produit")}</small></div>`;
+  document.body.appendChild(notice);
+  setTimeout(()=>notice.remove(),2200);
 }
 
 function buyNow(id){
@@ -149,7 +182,7 @@ function buyNow(id){
   cart=[product];
   renderBag();
   closeProductDetails();
-  checkout();
+  openBag();
 }
 
 function renderBag(){
@@ -182,7 +215,7 @@ function openProductDetails(id){
   document.getElementById("productDetailName").textContent=product.name||"Produit";
   document.getElementById("productDetailPrice").textContent=Number(product.price||0).toFixed(2)+" DH";
   document.getElementById("productDetailDescription").textContent=product.description||"Aucune description disponible pour le moment.";
-  document.getElementById("productDetailAdd").onclick=()=>{addById(product.id);closeProductDetails();};
+  document.getElementById("productDetailAdd").onclick=()=>{addById(product.id,{currentTarget:document.getElementById("productDetailAdd")});closeProductDetails();};
   document.getElementById("productDetailBuyNow").onclick=()=>buyNow(product.id);
   renderProductGallery();
   document.getElementById("productDetailModal").classList.add("show");
