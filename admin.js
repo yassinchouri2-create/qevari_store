@@ -104,11 +104,12 @@ async function deleteProduct(id){
   renderProducts();
 }
 async function loadSocialLinks(){
-  const {data,error}=await sb.from("site_settings").select("instagram_url,tiktok_url,facebook_url").eq("id",1).maybeSingle();
+  const {data,error}=await sb.from("site_settings").select("instagram_url,tiktok_url,facebook_url,whatsapp_phone").eq("id",1).maybeSingle();
   if(error){console.warn("QEVARI settings:",error.message);return;}
   document.getElementById("instagramUrl").value=data?.instagram_url||"";
   document.getElementById("tiktokUrl").value=data?.tiktok_url||"";
   document.getElementById("facebookUrl").value=data?.facebook_url||"";
+  document.getElementById("whatsappPhone").value=data?.whatsapp_phone||"";
 }
 async function saveSocialLinks(){
   const payload={
@@ -116,6 +117,7 @@ async function saveSocialLinks(){
     instagram_url:document.getElementById("instagramUrl").value.trim()||null,
     tiktok_url:document.getElementById("tiktokUrl").value.trim()||null,
     facebook_url:document.getElementById("facebookUrl").value.trim()||null,
+    whatsapp_phone:document.getElementById("whatsappPhone").value.trim()||null,
     updated_at:new Date().toISOString()
   };
   const {error}=await sb.from("site_settings").upsert(payload);

@@ -30,6 +30,7 @@ create table if not exists public.site_settings (
   facebook_url text,
   updated_at timestamptz not null default now()
 );
+alter table public.site_settings add column if not exists whatsapp_phone text;
 alter table public.site_settings enable row level security;
 drop policy if exists "public_read_site_settings" on public.site_settings;
 drop policy if exists "authenticated_manage_site_settings" on public.site_settings;

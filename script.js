@@ -54,7 +54,7 @@ function filterProducts(category){
   const title=document.getElementById("collectionTitle");
   if(title) title.textContent=selectedCategory||"NEW IN";
   document.querySelectorAll(".category-filter").forEach(button=>{
-    button.classList.toggle("active",button.textContent.trim().toLocaleLowerCase()===(selectedCategory||"Tout").toLocaleLowerCase());
+    button.classList.toggle("active",(button.dataset.category||"").toLocaleLowerCase()===selectedCategory.toLocaleLowerCase());
   });
   render();
 }
@@ -70,11 +70,11 @@ function setupCategoryLinks(){
     ["footer div:nth-child(2) a:nth-of-type(1)",""],
     ["footer div:nth-child(2) a:nth-of-type(2)","Homme"],
     ["footer div:nth-child(2) a:nth-of-type(3)","Femme"],
-    ["footer div:nth-child(2) a:nth-of-type(4)","Occasion"],
+    ["footer div:nth-child(2) a:nth-of-type(4)","Promotions"],
     ["footer div:nth-child(3) a:nth-of-type(1)","values"],
-    ["footer div:nth-child(3) a:nth-of-type(2)",""],
-    ["footer div:nth-child(3) a:nth-of-type(3)","Accessoires"],
-    ["footer div:nth-child(3) a:nth-of-type(4)","Électronique"]
+    ["footer div:nth-child(3) a:nth-of-type(2)","Sacs & Accessoires"],
+    ["footer div:nth-child(3) a:nth-of-type(3)","Équipement Maison"],
+    ["footer div:nth-child(3) a:nth-of-type(4)","Occasion"]
   ];
   links.forEach(([selector,category])=>{
     const link=document.querySelector(selector);
@@ -121,12 +121,15 @@ async function loadSocialLinks(){
   if(!window.QEVARI_SUPABASE_URL || window.QEVARI_SUPABASE_URL.includes("PASTE_"))return;
   try{
     const client=supabase.createClient(window.QEVARI_SUPABASE_URL,window.QEVARI_SUPABASE_KEY);
-    const {data,error}=await client.from("site_settings").select("instagram_url,tiktok_url,facebook_url").eq("id",1).maybeSingle();
+    const {data,error}=await client.from("site_settings").select("instagram_url,tiktok_url,facebook_url,whatsapp_phone").eq("id",1).maybeSingle();
     if(error || !data)return;
     const footerLinks=document.querySelectorAll("footer div:nth-child(4) a");
     [[footerLinks[0],data.instagram_url],[footerLinks[1],data.tiktok_url],[footerLinks[2],data.facebook_url]].forEach(([link,url])=>{
       if(link && url){link.href=url;link.target="_blank";link.rel="noopener";}
     });
+    const whatsapp=document.getElementById("whatsappConsultation");
+    const phone=String(data.whatsapp_phone||"").replace(/\D/g,"");
+    if(whatsapp && phone)whatsapp.href="https://wa.me/"+phone;
   }catch(err){console.warn("QEVARI social links:",err);}
 }
 
