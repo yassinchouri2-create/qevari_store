@@ -143,6 +143,15 @@ function addById(id){
   openBag();
 }
 
+function buyNow(id){
+  const product=products.find(p=>String(p.id)===String(id));
+  if(!product)return;
+  cart=[product];
+  renderBag();
+  closeProductDetails();
+  checkout();
+}
+
 function renderBag(){
   const count=document.getElementById("count");
   const items=document.getElementById("items");
@@ -174,6 +183,7 @@ function openProductDetails(id){
   document.getElementById("productDetailPrice").textContent=Number(product.price||0).toFixed(2)+" DH";
   document.getElementById("productDetailDescription").textContent=product.description||"Aucune description disponible pour le moment.";
   document.getElementById("productDetailAdd").onclick=()=>{addById(product.id);closeProductDetails();};
+  document.getElementById("productDetailBuyNow").onclick=()=>buyNow(product.id);
   renderProductGallery();
   document.getElementById("productDetailModal").classList.add("show");
 }
