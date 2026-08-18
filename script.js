@@ -1,5 +1,5 @@
 let products=[];
-let selectedCategory="";
+let selectedCategory=null;
 const values=[
 ["Q","QUALITY","Qualité","Calidad","الجودة","Kalite","품질"],
 ["E","EXCELLENCE","Excellence","Excelencia","التميز","Mükemmellik","우수성"],
@@ -17,6 +17,11 @@ function getImageUrls(value){
   return String(value||"").split(/[\n,]/).map(url=>url.trim()).filter(Boolean);
 }
 
+function productWithSelectedImage(product){
+  const image=activeProductImages[activeProductImageIndex]||"";
+  return image?{...product,selected_image:image}:product;
+}
+
 function renderValues(){
   const el=document.getElementById("valueGrid");
   if(!el)return;
@@ -28,7 +33,11 @@ function renderValues(){
 function render(){
   const el=document.getElementById("products");
   if(!el)return;
-  const visibleProducts=selectedCategory
+  const isPreview=selectedCategory===null;
+  if(isPreview)document.querySelectorAll(".category-filter").forEach(button=>button.classList.remove("active"));
+  const visibleProducts=isPreview
+    ? products.slice(0,3)
+    : selectedCategory
     ? products.filter(p=>String(p.category||"").trim().toLocaleLowerCase()===selectedCategory.toLocaleLowerCase())
     : products;
   if(!visibleProducts.length){
@@ -45,7 +54,7 @@ function render(){
       <button class="buy-now" onclick="buyNow('${escapeHtml(p.id)}')">COMMANDER DIRECTEMENT</button>
       <button class="add" onclick="addById('${escapeHtml(p.id)}',event)">AJOUTER AU PANIER</button>
     </div>
-  </article>`}).join("");
+  </article>`}).join("")+(isPreview&&products.length>3?'<div class="product-show-all"><p>Découvre toute la collection.</p><button class="view-details" onclick="filterProducts(\'\')">VOIR TOUS LES PRODUITS</button></div>':"");
   renderBag();
 }
 
@@ -54,7 +63,7 @@ function filterProducts(category){
   const title=document.getElementById("collectionTitle");
   if(title) title.textContent=selectedCategory||"NEW IN";
   document.querySelectorAll(".category-filter").forEach(button=>{
-    button.classList.toggle("active",(button.dataset.category||"").toLocaleLowerCase()===selectedCategory.toLocaleLowerCase());
+    button.classList.toggle("active",selectedCategory!==null&&(button.dataset.category||"").toLocaleLowerCase()===selectedCategory.toLocaleLowerCase());
   });
   render();
 }
@@ -142,6 +151,11 @@ function add(i){
 function addById(id,event){
   const product=products.find(p=>String(p.id)===String(id));
   if(!product)return;
+  if(getImageUrls(product.image_url).length>1){openProductDetails(id);return;}
+  addProductToCart(product,event);
+}
+
+function addProductToCart(product,event){
   cart.push(product);
   renderBag();
   animateToCart(product,event?.currentTarget);
@@ -182,6 +196,11 @@ function showCartNotice(product){
 function buyNow(id){
   const product=products.find(p=>String(p.id)===String(id));
   if(!product)return;
+  if(getImageUrls(product.image_url).length>1){openProductDetails(id);return;}
+  buyProductNow(product);
+}
+
+function buyProductNow(product){
   cart=[product];
   renderBag();
   closeProductDetails();
@@ -218,8 +237,8 @@ function openProductDetails(id){
   document.getElementById("productDetailName").textContent=product.name||"Produit";
   document.getElementById("productDetailPrice").textContent=Number(product.price||0).toFixed(2)+" DH";
   document.getElementById("productDetailDescription").textContent=product.description||"Aucune description disponible pour le moment.";
-  document.getElementById("productDetailAdd").onclick=()=>{addById(product.id,{currentTarget:document.getElementById("productDetailAdd")});closeProductDetails();};
-  document.getElementById("productDetailBuyNow").onclick=()=>buyNow(product.id);
+  document.getElementById("productDetailAdd").onclick=()=>{addProductToCart(productWithSelectedImage(product),{currentTarget:document.getElementById("productDetailAdd")});closeProductDetails();};
+  document.getElementById("productDetailBuyNow").onclick=()=>buyProductNow(productWithSelectedImage(product));
   renderProductGallery();
   document.getElementById("productDetailModal").classList.add("show");
 }
@@ -238,7 +257,7 @@ async function submitOrder(e){
  e.preventDefault();
  if(!cart.length){alert("Ton panier est vide.");closeOrder();return;}
  const fd=new FormData(e.target);
- const items=cart.map(p=>({id:p.id,name:String(p.name||"Produit"),price:Number(p.price||0)}));
+ const items=cart.map(p=>({id:p.id,name:String(p.name||"Produit"),selected_image:p.selected_image||null,price:Number(p.price||0)}));
  const total=items.reduce((amount,item)=>amount+item.price,0);
  if(!Number.isFinite(total) || total<=0){alert("Le total de la commande est invalide. Vérifie les prix des produits.");return;}
  const order={customer_name:fd.get("name").trim(),customer_phone:fd.get("phone").trim(),customer_city:fd.get("city").trim(),customer_address:fd.get("address").trim(),items,total,status:"Nouveau"};

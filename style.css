@@ -4,6 +4,24 @@
 
 /* Keep customer-facing product photos uniform, contained, and inside their cards. */
 .product{min-width:0}
+
+/* Mobile product details: keep the overlay itself scrollable so the order actions
+   always remain reachable, even with long descriptions or small phone screens. */
+.modal{align-items:flex-start;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.modal-card{max-height:calc(100dvh - 40px);margin:auto 0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.product-detail-card .modal-close{position:sticky;top:-20px;right:auto;z-index:3;display:grid;place-items:center;width:42px;height:42px;margin-left:auto;border:1px solid #111;border-radius:50%;background:#f4f1eb;color:#111;font-size:28px;line-height:1;box-shadow:0 4px 12px #0002}
+.product-choice{grid-column:1/-1;padding:50px 24px;text-align:center;border:1px solid #cfc8bd;background:#eeebe5}.product-choice b{font-size:12px;letter-spacing:1.5px}.product-choice p{margin:12px 0 20px;font-size:12px;color:#555}.product-choice .view-details{max-width:280px;margin:0 auto}
+.product-show-all{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:220px;padding:25px;border:1px solid #cfc8bd;background:#eeebe5;text-align:center}.product-show-all p{margin:0 0 15px;font-size:12px;color:#555}.product-show-all .view-details{max-width:240px}
+.image-feature{position:relative;isolation:isolate;overflow:hidden;color:#fff;background:#0b0b0b}.image-feature::before{content:"";position:absolute;inset:0;z-index:-2;background-image:linear-gradient(180deg,#0001 0%,#000b 100%),var(--feature-image);background-position:center;background-size:cover;filter:brightness(.72) contrast(1.08);transition:transform .5s ease}.image-feature:hover::before{transform:scale(1.04)}.image-feature p,.image-feature h2,.image-feature a{position:relative;z-index:1}.image-feature a{color:#fff}.smoke-feature::after{content:"";position:absolute;inset:-20%;z-index:-1;background:radial-gradient(ellipse at 20% 72%,#ddd4 0%,#ddd0 35%),radial-gradient(ellipse at 78% 30%,#eee3 0%,#eee0 42%);filter:blur(22px);opacity:.42;animation:smoke-drift 9s ease-in-out infinite alternate;pointer-events:none}@keyframes smoke-drift{from{transform:translate3d(-3%,2%,0) scale(1)}to{transform:translate3d(4%,-3%,0) scale(1.12)}}.accessories-feature::before{filter:brightness(.66) contrast(1.05)}.electronics-feature::before{filter:brightness(.72) contrast(1.08)}
+@media(max-width:700px){
+  .modal{padding:12px}
+  .modal-card{max-height:calc(100dvh - 24px);padding:28px 20px;padding-bottom:max(28px,env(safe-area-inset-bottom));margin:auto 0}
+  .product-detail-card{width:100%}
+  .product-detail-main{height:clamp(220px,42dvh,300px)}
+  .product-detail-description{margin:18px 0}
+  .product-detail-card .modal-close{top:-16px;width:40px;height:40px}
+}
+
 .photo{height:350px;padding:24px;overflow:hidden}
 .photo img{display:block;width:100%;height:100%;max-width:210px;max-height:210px;object-fit:contain;object-position:center}
 @media(max-width:800px){.photo{height:240px;padding:18px}.photo img{max-width:185px;max-height:185px}}
